@@ -46,6 +46,8 @@
 #include "ui/translate.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 enum AnimeListTooltips {
@@ -268,6 +270,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
         // Draw title
         rect.left += rect_image.Width() + 8;
         int bk_mode = dc.SetBkMode(TRANSPARENT);
+        dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
         const auto& title = anime::GetPreferredTitle(*anime_item);
         dc.AttachFont(ui::Theme.GetHeaderFont());
         dc.DrawText(title.c_str(), title.length(), rect,
@@ -276,7 +279,7 @@ INT_PTR AnimeListDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         // Draw second line of information
         rect.top += 20;
-        COLORREF text_color = dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+        COLORREF text_color = dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
         std::wstring text = ToWstr(anime_item->GetMyLastWatchedEpisode()) + L"/" +
                        ToWstr(anime_item->GetEpisodeCount());
         dc.DrawText(text.c_str(), -1, rect,
@@ -1141,7 +1144,7 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
   dc.SetBkMode(TRANSPARENT);
 
   // Separator
-  dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+  dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
   dc.DrawText(L"/", 1, rcText,
               DT_CENTER | DT_VCENTER | DT_SINGLELINE);
   dc.SetTextColor(text_color);
@@ -1150,11 +1153,11 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
   text = ui::TranslateNumber(eps_watched, L"0");
   rcText.right -= (rcText.Width() / 2) + ScaleX(4);
   if (!eps_watched) {
-    dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+    dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
   } else if (!anime::IsValidEpisodeNumber(eps_watched, eps_total)) {
-    dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
+    dc.SetTextColor(win::dark::SysColor(COLOR_HIGHLIGHT));
   } else if (eps_watched < eps_total && anime_item.GetMyStatus() == anime::MyStatus::Completed) {
-    dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHT));
+    dc.SetTextColor(win::dark::SysColor(COLOR_HIGHLIGHT));
   }
   dc.DrawText(text.c_str(), text.length(), rcText,
               DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
@@ -1165,7 +1168,7 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
   rcText.left = rcText.right + ScaleX(8);
   rcText.right = rc->right;
   if (!eps_total)
-    dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+    dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
   dc.DrawText(text.c_str(), text.length(), rcText,
               DT_LEFT | DT_VCENTER | DT_SINGLELINE);
   dc.SetTextColor(text_color);
@@ -1190,11 +1193,11 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     dc.SetBkMode(TRANSPARENT);
 
     std::wstring text = ui::TranslateMyScore(anime_item.GetMyScore());
-    dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+    dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
     dc.DrawText(text.c_str(), text.length(), rcBox, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 
     dc.EditFont(nullptr, 5);
-    dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+    dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
     dc.DrawText(L"\u25BC", 1, rcBox, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
     dc.SetTextColor(text_color);
   }
@@ -1209,9 +1212,15 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
     case CDDS_PREPAINT:
       return CDRF_NOTIFYITEMDRAW;
     case CDDS_ITEMPREPAINT:
+      // Native group-view header (the list ignores clrText for groups)
+      if (win::dark::Enabled() && pCD->dwItemType == LVCDI_GROUP) {
+        return win::dark::DrawListGroupHeader(
+            listview.GetWindowHandle(), pCD->nmcd.hdc,
+            static_cast<int>(pCD->nmcd.dwItemSpec));
+      }
       // Alternate background color
       if ((pCD->nmcd.dwItemSpec % 2) && !listview.IsGroupViewEnabled())
-        pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);
+        pCD->clrTextBk = win::dark::Enabled() ? win::dark::AltRowColor() : ChangeColorBrightness(::GetSysColor(COLOR_WINDOW), -0.03f);
       return CDRF_NOTIFYSUBITEMDRAW;
 
     case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
@@ -1220,42 +1229,42 @@ LRESULT AnimeListDialog::OnListCustomDraw(LPARAM lParam) {
         break;
 
       // Change text color
-      pCD->clrText = GetSysColor(COLOR_WINDOWTEXT);
+      pCD->clrText = win::dark::SysColor(COLOR_WINDOWTEXT);
       auto column_type = listview.FindColumnAtSubItemIndex(pCD->iSubItem);
       switch (column_type) {
         case kColumnAnimeRating:
           if (!anime_item->GetScore())
-            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+            pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
           break;
         case kColumnAnimeTitle:
           if (anime_item->IsNextEpisodeAvailable() &&
               taiga::settings.GetAppListHighlightNewEpisodes())
-            pCD->clrText = GetSysColor(COLOR_HIGHLIGHT);
+            pCD->clrText = win::dark::SysColor(COLOR_HIGHLIGHT);
           break;
         case kColumnAnimeType:
           if (anime_item->GetType() == anime::SeriesType::Unknown)
-            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+            pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
           break;
         case kColumnUserRating:
           if (!anime_item->GetMyScore())
-            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+            pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
           break;
         case kColumnAnimeSeason:
           if (!anime::IsValidDate(anime_item->GetDateStart()))
-            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+            pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
           break;
         case kColumnUserLastUpdated:
           if (anime_item->GetMyLastUpdated().empty() ||
               anime_item->GetMyLastUpdated() == L"0")
-            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+            pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
           break;
         case kColumnUserDateStarted:
           if (!anime::IsValidDate(anime_item->GetMyDateStart()))
-            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+            pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
           break;
         case kColumnUserDateCompleted:
           if (!anime::IsValidDate(anime_item->GetMyDateEnd()))
-            pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+            pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
           break;
       }
 

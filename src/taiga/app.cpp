@@ -16,6 +16,7 @@
 ** along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <windows/win/dark.h>
 #include <windows/win/taskbar.h>
 
 #include "taiga/app.h"
@@ -128,6 +129,10 @@ BOOL App::InitInstance() {
   http::Init();
   InitCommonControls(ICC_STANDARD_CLASSES);
   OleInitialize(nullptr);
+
+  // Initialize dark mode (Dark Edition) before any window is created
+  win::dark::Initialize();
+  ui::InitDarkColors();
 
   // Load data
   detail::LoadData();

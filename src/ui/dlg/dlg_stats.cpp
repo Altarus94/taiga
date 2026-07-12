@@ -29,6 +29,8 @@
 #include "ui/theme.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 StatsDialog DlgStats;
@@ -58,9 +60,9 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     case WM_CTLCOLORSTATIC: {
       win::Dc dc = reinterpret_cast<HDC>(wParam);
       dc.SetBkMode(TRANSPARENT);
-      dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+      dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
       dc.DetachDc();
-      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+      return reinterpret_cast<INT_PTR>(win::dark::SysBrush(COLOR_WINDOW));
     }
 
     case WM_DRAWITEM: {
@@ -70,7 +72,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         win::Rect rect = dis->rcItem;
         win::Dc dc = dis->hDC;
 
-        dc.FillRect(dis->rcItem, ::GetSysColor(COLOR_WINDOW));
+        dc.FillRect(dis->rcItem, win::dark::SysColor(COLOR_WINDOW));
 
         int bar_height = GetTextHeight(dc.Get());
         int bar_max = rect.Width() * 3 / 4;
@@ -93,7 +95,7 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             rect_text.right = dis->rcItem.right;
             dc.EditFont(nullptr, 7);
             dc.SetBkMode(TRANSPARENT);
-            dc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+            dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
             dc.DrawText(text.c_str(), text.length(), rect_text,
                         DT_SINGLELINE | DT_VCENTER);
           }
@@ -121,7 +123,7 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint background
   rect.Copy(lpps->rcPaint);
-  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_WINDOW));
 
   // Paint header lines
   for (int i = 0; i < 4; i++) {
@@ -130,9 +132,9 @@ void StatsDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
     header.GetWindowRect(GetWindowHandle(), &rect_header);
     rect_header.top = rect_header.bottom + 3;
     rect_header.bottom =  rect_header.top + 1;
-    dc.FillRect(rect_header, ::GetSysColor(COLOR_ACTIVEBORDER));
+    dc.FillRect(rect_header, win::dark::SysColor(COLOR_ACTIVEBORDER));
     rect_header.Offset(0, 1);
-    dc.FillRect(rect_header, ::GetSysColor(COLOR_WINDOW));
+    dc.FillRect(rect_header, win::dark::SysColor(COLOR_WINDOW));
     header.SetWindowHandle(nullptr);
   }
 }

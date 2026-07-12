@@ -26,6 +26,8 @@
 #include "taiga/settings.h"
 #include "ui/menu.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 FormatDialog DlgFormat;
@@ -151,7 +153,7 @@ void FormatDialog::ColorizeText() {
   rich_edit_.GetText(text);
 
   // Reset all colors
-  cf.crTextColor = ::GetSysColor(COLOR_WINDOWTEXT);
+  cf.crTextColor = win::dark::SysColor(COLOR_WINDOWTEXT);
   rich_edit_.SetCharFormat(SCF_ALL, &cf);
 
   // Highlight
@@ -159,7 +161,8 @@ void FormatDialog::ColorizeText() {
     switch (text[i]) {
       // Highlight functions
       case '$': {
-        cf.crTextColor = RGB(0, 0, 160);
+        cf.crTextColor = win::dark::Enabled() ? RGB(0x6C, 0xB3, 0xF0)
+                                              : RGB(0, 0, 160);
         size_t pos = text.find('(', i);
         if (pos != std::wstring::npos) {
           if (IsScriptFunction(text.substr(i + 1, pos - (i + 1)))) {
@@ -172,7 +175,8 @@ void FormatDialog::ColorizeText() {
       }
       // Highlight keywords
       case '%': {
-        cf.crTextColor = RGB(0, 160, 0);
+        cf.crTextColor = win::dark::Enabled() ? RGB(0x8F, 0xE0, 0x6B)
+                                              : RGB(0, 160, 0);
         size_t pos = text.find('%', i + 1);
         if (pos != std::wstring::npos) {
           if (IsScriptVariable(text.substr(i + 1, pos - (i + 1)))) {

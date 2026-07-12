@@ -30,6 +30,8 @@
 #include "ui/dlg/dlg_feed_condition.h"
 #include "ui/translate.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 FeedConditionDialog DlgFeedCondition;
@@ -101,9 +103,9 @@ INT_PTR FeedConditionDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
     case WM_CTLCOLORSTATIC: {
       win::Dc dc = reinterpret_cast<HDC>(wParam);
       dc.SetBkMode(TRANSPARENT);
-      dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+      dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
       dc.DetachDc();
-      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+      return reinterpret_cast<INT_PTR>(win::dark::SysBrush(COLOR_WINDOW));
     }
   }
 
@@ -162,17 +164,17 @@ void FeedConditionDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint background
   GetClientRect(&rect);
-  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_WINDOW));
 
   // Paint bottom area
   win::Rect rect_button;
   ::GetClientRect(GetDlgItem(IDCANCEL), &rect_button);
   rect.top = rect.bottom - (rect_button.Height() * 2);
-  dc.FillRect(rect, ::GetSysColor(COLOR_BTNFACE));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_BTNFACE));
 
   // Paint line
   rect.bottom = rect.top + 1;
-  dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_ACTIVEBORDER));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

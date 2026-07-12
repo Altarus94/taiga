@@ -18,6 +18,8 @@
 
 #include "ui/theme.h"
 
+#include <windows/win/dark.h>
+
 #include "base/format.h"
 #include "base/gfx.h"
 #include "base/string.h"
@@ -27,6 +29,28 @@
 #include "ui/ui.h"
 
 namespace ui {
+
+// Light palette defaults; swapped by InitDarkColors()
+COLORREF kColorDarkBlue = RGB(46, 81, 162);
+COLORREF kColorGray = RGB(230, 230, 230);
+COLORREF kColorLightBlue = RGB(225, 231, 245);
+COLORREF kColorLightGray = RGB(248, 248, 248);
+COLORREF kColorLightGreen = RGB(225, 245, 231);
+COLORREF kColorLightRed = RGB(245, 225, 231);
+COLORREF kColorMainInstruction = RGB(0x00, 0x33, 0x99);
+
+void InitDarkColors() {
+  if (!win::dark::Enabled())
+    return;
+
+  kColorDarkBlue = RGB(0x4C, 0x8B, 0xD8);         // stats chart bars
+  kColorGray = RGB(0x39, 0x40, 0x4B);             // card borders
+  kColorLightBlue = RGB(0x2C, 0x3B, 0x52);        // "finished airing" band
+  kColorLightGray = RGB(0x2B, 0x31, 0x3A);        // card backgrounds
+  kColorLightGreen = RGB(0x27, 0x3D, 0x30);       // "airing" band, now playing
+  kColorLightRed = RGB(0x45, 0x2B, 0x33);         // "not yet aired" band
+  kColorMainInstruction = RGB(0x6C, 0xB3, 0xF0);  // header text
+}
 
 ThemeManager::ThemeManager() {
   icons16_.Create(ScaleX(16), ScaleY(16));  // 16px
@@ -110,7 +134,7 @@ void ThemeManager::CreateBrushes() {
   if (brush_background_.Get())
     return;
 
-  brush_background_.Set(CreateSolidBrush(GetSysColor(COLOR_WINDOW)));
+  brush_background_.Set(CreateSolidBrush(win::dark::SysColor(COLOR_WINDOW)));
 }
 
 void ThemeManager::CreateFonts(HDC hdc) {

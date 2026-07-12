@@ -61,6 +61,8 @@
 #include "ui/theme.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 MainDialog DlgMain;
@@ -171,7 +173,7 @@ void MainDialog::CreateDialogControls() {
   cancel_button.SetPosition(nullptr, rcButton);
   // Create treeview control
   treeview.Attach(GetDlgItem(IDC_TREE_MAIN));
-  treeview.SendMessage(TVM_SETBKCOLOR, 0, ::GetSysColor(COLOR_3DFACE));
+  treeview.SendMessage(TVM_SETBKCOLOR, 0, win::dark::SysColor(COLOR_3DFACE));
   treeview.SetImageList(ui::Theme.GetImageList16().GetHandle());
   treeview.SetItemHeight(ScaleY(20));
   treeview.SetTheme();
@@ -639,8 +641,12 @@ void MainDialog::OnDropFiles(HDROP hDropInfo) {
 }
 
 LRESULT MainDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
+  // Rebar control (dark mode drawing)
+  if (idCtrl == IDC_REBAR_MAIN && pnmh->code == NM_CUSTOMDRAW) {
+    return win::dark::HandleRebarCustomDraw(reinterpret_cast<LPARAM>(pnmh));
+
   // Toolbar controls
-  if (idCtrl == IDC_TOOLBAR_MENU ||
+  } else if (idCtrl == IDC_TOOLBAR_MENU ||
       idCtrl == IDC_TOOLBAR_MAIN ||
       idCtrl == IDC_TOOLBAR_SEARCH) {
     return OnToolbarNotify(reinterpret_cast<LPARAM>(pnmh));
@@ -670,10 +676,10 @@ void MainDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
     win::Rect rect;
 
     rect.Copy(rect_sidebar_);
-    dc.FillRect(rect, ::GetSysColor(COLOR_3DFACE));
+    dc.FillRect(rect, win::dark::SysColor(COLOR_3DFACE));
 
     rect.left = rect.right - 1;
-    dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
+    dc.FillRect(rect, win::dark::SysColor(COLOR_ACTIVEBORDER));
   }
 }
 

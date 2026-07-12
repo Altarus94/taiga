@@ -96,13 +96,18 @@ enum ListProgressType {
   kListProgressWatching,
 };
 
-constexpr COLORREF kColorDarkBlue = RGB(46, 81, 162);
-constexpr COLORREF kColorGray = RGB(230, 230, 230);
-constexpr COLORREF kColorLightBlue = RGB(225, 231, 245);
-constexpr COLORREF kColorLightGray = RGB(248, 248, 248);
-constexpr COLORREF kColorLightGreen = RGB(225, 245, 231);
-constexpr COLORREF kColorLightRed = RGB(245, 225, 231);
-constexpr COLORREF kColorMainInstruction = RGB(0x00, 0x33, 0x99);
+// Dark Edition: no longer constexpr — InitDarkColors() swaps these for their
+// dark-mode equivalents at startup, keeping every call site unchanged.
+extern COLORREF kColorDarkBlue;
+extern COLORREF kColorGray;
+extern COLORREF kColorLightBlue;
+extern COLORREF kColorLightGray;
+extern COLORREF kColorLightGreen;
+extern COLORREF kColorLightRed;
+extern COLORREF kColorMainInstruction;
+
+// Applies the dark palette to the colors above when win::dark::Enabled()
+void InitDarkColors();
 
 class ThemeManager {
 public:

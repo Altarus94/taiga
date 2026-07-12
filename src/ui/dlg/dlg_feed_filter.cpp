@@ -34,6 +34,8 @@
 #include "ui/translate.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 FeedFilterDialog DlgFeedFilter;
@@ -60,7 +62,7 @@ INT_PTR FeedFilterDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM
       if (hwnd_control == GetDlgItem(IDC_STATIC_HEADER)) {
         SetBkMode(hdc, TRANSPARENT);
         SetTextColor(hdc, ui::kColorMainInstruction);
-        return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+        return reinterpret_cast<INT_PTR>(win::dark::SysBrush(COLOR_WINDOW));
       }
       break;
     }
@@ -130,17 +132,17 @@ void FeedFilterDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint background
   GetClientRect(&rect);
-  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_WINDOW));
 
   // Paint bottom area
   win::Rect rect_button;
   ::GetClientRect(GetDlgItem(IDCANCEL), &rect_button);
   rect.top = rect.bottom - (rect_button.Height() * 2);
-  dc.FillRect(rect, ::GetSysColor(COLOR_BTNFACE));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_BTNFACE));
 
   // Paint line
   rect.bottom = rect.top + 1;
-  dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_ACTIVEBORDER));
 }
 
 BOOL FeedFilterDialog::OnCommand(WPARAM wParam, LPARAM lParam) {
@@ -235,9 +237,9 @@ INT_PTR FeedFilterDialog::DialogPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wP
     case WM_CTLCOLORSTATIC: {
       win::Dc dc = reinterpret_cast<HDC>(wParam);
       dc.SetBkMode(TRANSPARENT);
-      dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+      dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
       dc.DetachDc();
-      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+      return reinterpret_cast<INT_PTR>(win::dark::SysBrush(COLOR_WINDOW));
     }
   }
 

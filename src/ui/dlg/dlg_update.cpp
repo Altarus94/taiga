@@ -26,6 +26,8 @@
 #include "ui/dialog.h"
 #include "ui/theme.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 UpdateDialog DlgUpdate;
@@ -62,9 +64,9 @@ INT_PTR UpdateDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     case WM_CTLCOLORSTATIC: {
       win::Dc dc = reinterpret_cast<HDC>(wParam);
       dc.SetBkMode(TRANSPARENT);
-      dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+      dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
       dc.DetachDc();
-      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+      return reinterpret_cast<INT_PTR>(win::dark::SysBrush(COLOR_WINDOW));
     }
   }
 
@@ -100,7 +102,7 @@ void UpdateDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
     return;
 
   // Paint background
-  dc.FillRect(lpps->rcPaint, ::GetSysColor(COLOR_WINDOW));
+  dc.FillRect(lpps->rcPaint, win::dark::SysColor(COLOR_WINDOW));
 
   // Paint application icon
   win::Window label = GetDlgItem(IDC_STATIC_APP_ICON);

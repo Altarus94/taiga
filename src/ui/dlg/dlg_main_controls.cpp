@@ -32,6 +32,8 @@
 #include "ui/theme.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,13 +98,13 @@ LRESULT MainDialog::OnTreeNotify(LPARAM lParam) {
           if (treeview.IsSeparator(pCD->nmcd.lItemlParam)) {
             win::Rect rcItem = pCD->nmcd.rc;
             win::Dc hdc = pCD->nmcd.hdc;
-            hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DFACE));
+            hdc.FillRect(rcItem, win::dark::SysColor(COLOR_3DFACE));
             rcItem.top += (rcItem.bottom - rcItem.top) / 2;
-            //GradientRect(hdc.Get(), &rcItem, ::GetSysColor(COLOR_3DLIGHT), ::GetSysColor(COLOR_3DFACE), true);
+            //GradientRect(hdc.Get(), &rcItem, win::dark::SysColor(COLOR_3DLIGHT), win::dark::SysColor(COLOR_3DFACE), true);
             rcItem.bottom = rcItem.top + 2;
-            hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DHIGHLIGHT));
+            hdc.FillRect(rcItem, win::dark::SysColor(COLOR_3DHIGHLIGHT));
             rcItem.bottom -= 1;
-            hdc.FillRect(rcItem, ::GetSysColor(COLOR_3DLIGHT));
+            hdc.FillRect(rcItem, win::dark::SysColor(COLOR_3DLIGHT));
             hdc.DetachDc();
           }
           return CDRF_DODEFAULT;
@@ -161,7 +163,9 @@ LRESULT MainDialog::CancelButton::OnCustomDraw(LPARAM lParam) {
   switch (pCD->dwDrawStage) {
     case CDDS_PREPAINT: {
       win::Dc dc = pCD->hdc;
-      dc.FillRect(pCD->rc, ::GetSysColor(COLOR_WINDOW));
+      // Match the search edit field background
+      dc.FillRect(pCD->rc, win::dark::Enabled() ? win::dark::FieldColor()
+                                                : ::GetSysColor(COLOR_WINDOW));
       ui::Theme.GetImageList16().Draw(ui::kIcon16_Cross, dc.Get(), 0, 0);
       dc.DetachDc();
       return CDRF_SKIPDEFAULT;
@@ -275,6 +279,10 @@ LRESULT CALLBACK MainDialog::ToolbarWithMenu::HookProc(int code, WPARAM wParam, 
 
 LRESULT MainDialog::OnToolbarNotify(LPARAM lParam) {
   switch (reinterpret_cast<LPNMHDR>(lParam)->code) {
+    // Dark mode drawing
+    case NM_CUSTOMDRAW: {
+      return win::dark::HandleToolbarCustomDraw(lParam);
+    }
     // Dropdown button click
     case TBN_DROPDOWN: {
       LPNMTOOLBAR nmt = reinterpret_cast<LPNMTOOLBAR>(lParam);

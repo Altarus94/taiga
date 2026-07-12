@@ -57,6 +57,8 @@
 #include "ui/theme.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 SettingsPage::SettingsPage()
@@ -94,7 +96,8 @@ void SettingsPage::Create() {
 
   win::Dialog::Create(resource_id, parent->GetWindowHandle(), false);
   SetPosition(nullptr, rect_page, 0);
-  EnableThemeDialogTexture(GetWindowHandle(), ETDT_ENABLETAB);
+  EnableThemeDialogTexture(GetWindowHandle(),
+      win::dark::Enabled() ? ETDT_DISABLE : ETDT_ENABLETAB);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -465,7 +468,7 @@ INT_PTR SettingsPage::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
       // We use WS_EX_TRANSPARENT to identify secondary static controls
       if (::GetWindowLong(hwnd_static, GWL_EXSTYLE) & WS_EX_TRANSPARENT) {
         ::SetBkMode(hdc, TRANSPARENT);
-        ::SetTextColor(hdc, ::GetSysColor(COLOR_GRAYTEXT));
+        ::SetTextColor(hdc, win::dark::SysColor(COLOR_GRAYTEXT));
         return reinterpret_cast<INT_PTR>(::GetStockObject(HOLLOW_BRUSH));
       }
       break;

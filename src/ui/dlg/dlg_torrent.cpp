@@ -42,6 +42,8 @@
 #include "ui/theme.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 enum TorrentListColumn {
@@ -367,7 +369,7 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           case CDDS_ITEMPREPAINT:
             // Alternate background color
             if ((pCD->nmcd.dwItemSpec % 2) && !list_.IsGroupViewEnabled())
-              pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);
+              pCD->clrTextBk = win::dark::Enabled() ? win::dark::AltRowColor() : ChangeColorBrightness(::GetSysColor(COLOR_WINDOW), -0.03f);
             return CDRF_NOTIFYSUBITEMDRAW;
 
           case CDDS_ITEMPREPAINT | CDDS_SUBITEM: {
@@ -385,15 +387,15 @@ LRESULT TorrentDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
                     pCD->clrTextBk = ui::kColorLightGreen;
                     break;
                   default:
-                    pCD->clrTextBk = GetSysColor(COLOR_WINDOW);
+                    pCD->clrTextBk = win::dark::SysColor(COLOR_WINDOW);
                     break;
                 }
               }
               // Change text color
               if (feed_item->state == track::FeedItemState::DiscardedInactive) {
-                pCD->clrText = GetSysColor(COLOR_GRAYTEXT);
+                pCD->clrText = win::dark::SysColor(COLOR_GRAYTEXT);
               } else if (feed_item->episode_data.new_episode) {
-                pCD->clrText = GetSysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
+                pCD->clrText = win::dark::SysColor(pCD->iSubItem == 1 ? COLOR_HIGHLIGHT : COLOR_WINDOWTEXT);
               }
             }
             return CDRF_NOTIFYPOSTPAINT;

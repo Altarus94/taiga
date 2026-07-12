@@ -44,6 +44,8 @@
 #include "ui/theme.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 AnimeDialog DlgAnime;
@@ -100,8 +102,10 @@ BOOL AnimeDialog::OnInitDialog() {
   switch (mode_) {
     case AnimeDialogMode::AnimeInformation:
       page_my_info.Create(IDD_ANIME_INFO_PAGE02, GetWindowHandle(), false);
-      EnableThemeDialogTexture(page_series_info.GetWindowHandle(), ETDT_ENABLETAB);
-      EnableThemeDialogTexture(page_my_info.GetWindowHandle(), ETDT_ENABLETAB);
+      EnableThemeDialogTexture(page_series_info.GetWindowHandle(),
+          win::dark::Enabled() ? ETDT_DISABLE : ETDT_ENABLETAB);
+      EnableThemeDialogTexture(page_my_info.GetWindowHandle(),
+          win::dark::Enabled() ? ETDT_DISABLE : ETDT_ENABLETAB);
       break;
     case AnimeDialogMode::NowPlaying:
       break;
@@ -141,12 +145,12 @@ INT_PTR AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
       if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE)) {
         dc.SetTextColor(ui::kColorMainInstruction);
       } else {
-        dc.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+        dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
       }
       dc.DetachDc();
       if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_TITLE))
         return reinterpret_cast<INT_PTR>(Theme.GetBackgroundBrush());
-      return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+      return reinterpret_cast<INT_PTR>(win::dark::SysBrush(COLOR_WINDOW));
     }
 
     case WM_DRAWITEM: {
@@ -156,9 +160,9 @@ INT_PTR AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         win::Rect rect = dis->rcItem;
         win::Dc dc = dis->hDC;
         // Paint border
-        dc.FillRect(rect, ::GetSysColor(COLOR_ACTIVEBORDER));
+        dc.FillRect(rect, win::dark::SysColor(COLOR_ACTIVEBORDER));
         rect.Inflate(-1, -1);
-        dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+        dc.FillRect(rect, win::dark::SysColor(COLOR_WINDOW));
         rect.Inflate(-1, -1);
         // Paint image
         if (const auto image = ui::image_db.GetImage(anime_id_)) {
@@ -170,7 +174,7 @@ INT_PTR AnimeDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         } else {
           dc.EditFont(nullptr, 64, TRUE);
           dc.SetBkMode(TRANSPARENT);
-          dc.SetTextColor(::GetSysColor(COLOR_ACTIVEBORDER));
+          dc.SetTextColor(win::dark::SysColor(COLOR_ACTIVEBORDER));
           dc.DrawText(L"?", 1, rect, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
           DeleteObject(dc.DetachFont());
         }
@@ -277,7 +281,7 @@ void AnimeDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
 
   // Paint background
   rect.Copy(lpps->rcPaint);
-  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_WINDOW));
 }
 
 void AnimeDialog::OnSize(UINT uMsg, UINT nType, SIZE size) {
@@ -395,7 +399,7 @@ void AnimeDialog::Tab::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
     rect.left, rect.top, rect.right, rect.top + tab_height);
   ::CombineRgn(fill_region, fill_region, region, RGN_DIFF);
   ::SelectClipRgn(hdc, fill_region);
-  HBRUSH hBGBrush = ::GetSysColorBrush(COLOR_WINDOW);
+  HBRUSH hBGBrush = win::dark::SysBrush(COLOR_WINDOW);
   ::FillRgn(hdc, fill_region, hBGBrush);
   ::DeleteObject(fill_region);
   ::DeleteObject(region);

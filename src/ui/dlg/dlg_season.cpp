@@ -37,6 +37,8 @@
 #include "ui/translate.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 enum SeasonToolbarCommand {
@@ -340,7 +342,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         }
         hdc.EditFont(L"Segoe UI", 9, -1, TRUE);
         hdc.SetBkMode(TRANSPARENT);
-        hdc.SetTextColor(::GetSysColor(COLOR_GRAYTEXT));
+        hdc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
         hdc.DrawText(text.c_str(), text.length(), rect,
                      DT_CENTER | DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
       }
@@ -349,7 +351,15 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
     }
 
     case CDDS_ITEMPREPAINT: {
-      result = CDRF_NOTIFYPOSTPAINT;
+      // The list ignores clrText for native group headers, so draw them fully
+      // (dark background + bright caption) instead.
+      if (win::dark::Enabled() && pCD->dwItemType == LVCDI_GROUP) {
+        result = win::dark::DrawListGroupHeader(
+            list_.GetWindowHandle(), pCD->nmcd.hdc,
+            static_cast<int>(pCD->nmcd.dwItemSpec));
+      } else {
+        result = CDRF_NOTIFYPOSTPAINT;
+      }
       break;
     }
 
@@ -470,6 +480,7 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
       rect_title.Inflate(-4, 0);
       hdc.EditFont(nullptr, -1, TRUE);
       hdc.SetBkMode(TRANSPARENT);
+      hdc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
       UINT nFormat = DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER;
       if (view_as == kSeasonViewAsImages)
         nFormat |= DT_CENTER;

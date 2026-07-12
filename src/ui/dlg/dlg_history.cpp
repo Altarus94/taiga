@@ -35,6 +35,8 @@
 #include "ui/translate.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 HistoryDialog DlgHistory;
@@ -101,7 +103,7 @@ LRESULT HistoryDialog::OnNotify(int idCtrl, LPNMHDR pnmh) {
           case CDDS_ITEMPREPAINT:
             // Alternate background color
             if (pCD->nmcd.dwItemSpec % 2)
-              pCD->clrTextBk = ChangeColorBrightness(GetSysColor(COLOR_WINDOW), -0.03f);
+              pCD->clrTextBk = win::dark::Enabled() ? win::dark::AltRowColor() : ChangeColorBrightness(::GetSysColor(COLOR_WINDOW), -0.03f);
             return CDRF_DODEFAULT;
         }
         break;

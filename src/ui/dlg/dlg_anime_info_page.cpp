@@ -42,6 +42,8 @@
 #include "ui/translate.h"
 #include "ui/ui.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 PageBaseInfo::PageBaseInfo()
@@ -75,7 +77,7 @@ INT_PTR PageBaseInfo::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         dc.DetachDc();
         if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_ALT))
           return reinterpret_cast<INT_PTR>(Theme.GetBackgroundBrush());
-        return reinterpret_cast<INT_PTR>(::GetSysColorBrush(COLOR_WINDOW));
+        return reinterpret_cast<INT_PTR>(win::dark::SysBrush(COLOR_WINDOW));
       }
       break;
     }
@@ -94,7 +96,7 @@ void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   rect.Copy(lpps->rcPaint);
   if (!parent->IsTabVisible())
-    dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+    dc.FillRect(rect, win::dark::SysColor(COLOR_WINDOW));
 
   // Paint header lines
   for (int i = 0; i < 3; i++) {
@@ -103,9 +105,9 @@ void PageBaseInfo::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
     header.GetWindowRect(GetWindowHandle(), &rect_header);
     rect_header.top = rect_header.bottom + 3;
     rect_header.bottom =  rect_header.top + 1;
-    dc.FillRect(rect_header, ::GetSysColor(COLOR_ACTIVEBORDER));
+    dc.FillRect(rect_header, win::dark::SysColor(COLOR_ACTIVEBORDER));
     rect_header.Offset(0, 1);
-    dc.FillRect(rect_header, ::GetSysColor(COLOR_WINDOW));
+    dc.FillRect(rect_header, win::dark::SysColor(COLOR_WINDOW));
     header.SetWindowHandle(nullptr);
   }
 }

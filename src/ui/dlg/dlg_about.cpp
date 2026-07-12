@@ -34,6 +34,8 @@
 #include "taiga/version.h"
 #include "ui/dlg/dlg_about.h"
 
+#include <windows/win/dark.h>
+
 namespace ui {
 
 enum ThirdPartyLibrary {
@@ -197,7 +199,7 @@ void AboutDialog::OnPaint(HDC hdc, LPPAINTSTRUCT lpps) {
   // Paint background
   GetClientRect(&rect);
   rect.left = sidebar_width;
-  dc.FillRect(rect, ::GetSysColor(COLOR_WINDOW));
+  dc.FillRect(rect, win::dark::SysColor(COLOR_WINDOW));
 
   // Paint application icon
   rect.Set(margin / 2, margin, sidebar_width - (margin / 2), rect.bottom);
