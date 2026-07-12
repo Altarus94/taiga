@@ -68,7 +68,7 @@
 
 [submodule "windows"]
 	path = deps/src/windows
-	url = https://github.com/erengy/windows.git
+	url = https://github.com/Altarus94/windows.git
 
 [submodule "zlib"]
 	path = deps/src/zlib
