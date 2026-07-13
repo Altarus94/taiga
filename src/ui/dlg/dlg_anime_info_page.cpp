@@ -74,6 +74,9 @@ INT_PTR PageBaseInfo::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
         win::Dc dc = reinterpret_cast<HDC>(wParam);
         HWND hwnd_control = reinterpret_cast<HWND>(lParam);
         dc.SetBkMode(TRANSPARENT);
+        // Set the text color explicitly: relying on the system default is
+        // light under Windows 10 dark mode but black under Windows 11.
+        dc.SetTextColor(win::dark::SysColor(COLOR_WINDOWTEXT));
         dc.DetachDc();
         if (hwnd_control == GetDlgItem(IDC_EDIT_ANIME_ALT))
           return reinterpret_cast<INT_PTR>(Theme.GetBackgroundBrush());
