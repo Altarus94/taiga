@@ -553,7 +553,14 @@ void AnimeListDialog::ListView::RefreshItem(int index) {
   if (GetSelectedCount() > 1)
     index = -1;
 
+  const int previous_hot_item = hot_item;
   hot_item = index;
+
+  // The hover chrome (episode buttons, score box) is only erased when the row
+  // that lost hotness is repainted; the control doesn't invalidate it for us,
+  // which leaves stale buttons behind when the mouse moves quickly
+  if (previous_hot_item != hot_item && previous_hot_item > -1)
+    RedrawItems(previous_hot_item, previous_hot_item, true);
 
   if (index < 0 || !progress_bars_visible) {
     tooltips.NewToolRect(kTooltipEpisodeAvailable, nullptr);

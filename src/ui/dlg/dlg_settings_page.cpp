@@ -227,7 +227,7 @@ BOOL SettingsPage::OnInitDialog() {
       bool enabled = taiga::settings.GetRecognitionDetectMediaPlayers();
       CheckDlgButton(IDC_CHECK_DETECT_MEDIA_PLAYER, enabled);
       win::ListView list = GetDlgItem(IDC_LIST_MEDIA);
-      list.Enable(enabled);
+      win::dark::EnableListView(list.GetWindowHandle(), enabled);
       list.EnableGroupView(true);
       list.InsertColumn(0, 0, 0, 0, L"Select/deselect all");
       list.InsertGroup(0, L"Supported media players");
@@ -262,7 +262,7 @@ BOOL SettingsPage::OnInitDialog() {
       bool enabled = taiga::settings.GetRecognitionDetectStreamingMedia();
       CheckDlgButton(IDC_CHECK_DETECT_STREAMING_MEDIA, enabled);
       win::ListView list = GetDlgItem(IDC_LIST_STREAM_PROVIDER);
-      list.Enable(enabled);
+      win::dark::EnableListView(list.GetWindowHandle(), enabled);
       list.EnableGroupView(true);
       list.InsertColumn(0, 0, 0, 0, L"Select/deselect all");
       list.InsertGroup(0, L"Supported media providers");
@@ -391,7 +391,7 @@ BOOL SettingsPage::OnInitDialog() {
     case kSettingsPageTorrentsFilters: {
       BOOL enable = taiga::settings.GetTorrentFilterEnabled();
       CheckDlgButton(IDC_CHECK_TORRENT_FILTER, enable);
-      EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
+      win::dark::EnableListView(GetDlgItem(IDC_LIST_TORRENT_FILTER), enable);
       EnableDlgItem(IDC_TOOLBAR_FEED_FILTER, enable);
       win::ListView list = GetDlgItem(IDC_LIST_TORRENT_FILTER);
       list.SetExtendedStyle(LVS_EX_CHECKBOXES | LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP | LVS_EX_LABELTIP);
@@ -622,12 +622,12 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         }
         case IDC_CHECK_DETECT_MEDIA_PLAYER: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
-          EnableDlgItem(IDC_LIST_MEDIA, enable);
+          win::dark::EnableListView(GetDlgItem(IDC_LIST_MEDIA), enable);
           return TRUE;
         }
         case IDC_CHECK_DETECT_STREAMING_MEDIA: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
-          EnableDlgItem(IDC_LIST_STREAM_PROVIDER, enable);
+          win::dark::EnableListView(GetDlgItem(IDC_LIST_STREAM_PROVIDER), enable);
           return TRUE;
         }
         case IDC_CHECK_HIGHLIGHT: {
@@ -671,7 +671,7 @@ BOOL SettingsPage::OnCommand(WPARAM wParam, LPARAM lParam) {
         // Enable/disable filters
         case IDC_CHECK_TORRENT_FILTER: {
           BOOL enable = IsDlgButtonChecked(LOWORD(wParam));
-          EnableDlgItem(IDC_LIST_TORRENT_FILTER, enable);
+          win::dark::EnableListView(GetDlgItem(IDC_LIST_TORRENT_FILTER), enable);
           EnableDlgItem(IDC_TOOLBAR_FEED_FILTER, enable);
           return TRUE;
         }
