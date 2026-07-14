@@ -105,6 +105,33 @@ bool ThemeManager::Load() {
   READ_PROGRESS_DATA(kListProgressWatching, L"watching");
   #undef READ_PROGRESS_DATA
 
+  // Dark Edition: stock themes were designed for a light UI. If dark mode is
+  // on and the loaded progress track is light, swap the structural colors
+  // (track, border, buttons) for dark equivalents. Status fill colors are
+  // kept, and already-dark custom themes are left untouched.
+  const auto is_light = [](COLORREF color) {
+    return (GetRValue(color) * 299 + GetGValue(color) * 587 +
+            GetBValue(color) * 114) / 1000 > 160;
+  };
+  if (win::dark::Enabled() &&
+      is_light(list_progress_[kListProgressBackground].value[0])) {
+    const auto set_solid = [this](ListProgressType type, COLORREF color) {
+      list_progress_[type].type = L"solid";
+      list_progress_[type].value[0] = color;
+      list_progress_[type].value[1] = 0;
+      list_progress_[type].value[2] = 0;
+    };
+    // Track: slightly brighter than the dark list background
+    list_progress_[kListProgressBackground].type = L"gradient";
+    list_progress_[kListProgressBackground].value[0] = RGB(0x2E, 0x34, 0x40);
+    list_progress_[kListProgressBackground].value[1] = RGB(0x3B, 0x42, 0x52);
+    list_progress_[kListProgressBackground].value[2] = 1;  // vertical
+    set_solid(kListProgressBorder, RGB(0x27, 0x2B, 0x33));
+    set_solid(kListProgressSeparator, RGB(0x4C, 0x56, 0x6A));
+    set_solid(kListProgressButton, RGB(0xD8, 0xDE, 0xE9));
+    set_solid(kListProgressAired, RGB(0x5E, 0x6A, 0x80));
+  }
+
   // Load icons
   icons16_.Remove(-1);
   icons24_.Remove(-1);
