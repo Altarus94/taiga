@@ -98,6 +98,8 @@ INT_PTR StatsDialog::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
             dc.DrawText(text.c_str(), text.length(), rect_text,
                         DT_SINGLELINE | DT_VCENTER);
+            // Restore the shared DC font
+            DeleteObject(dc.DetachFont());
           }
         }
 

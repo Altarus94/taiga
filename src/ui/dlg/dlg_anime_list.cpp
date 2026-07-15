@@ -1130,6 +1130,9 @@ void AnimeListDialog::ListView::DrawProgressBar(HDC hdc, RECT* rc, int index,
       dc.DrawText(L"Rewatching", -1, rcText,
                   DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
       dc.SetTextColor(text_color);
+      // Restore the DC font: it is shared with the rest of the paint cycle,
+      // and leaving the edited font selected garbles later text drawing
+      DeleteObject(dc.DetachFont());
     }
   }
 
@@ -1207,6 +1210,9 @@ void AnimeListDialog::ListView::DrawScoreBox(HDC hdc, RECT* rc, int index,
     dc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
     dc.DrawText(L"\u25BC", 1, rcBox, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
     dc.SetTextColor(text_color);
+    // Restore the DC font: leaving the size-5 font selected garbles the
+    // episode counters and other text drawn later in the same paint cycle
+    DeleteObject(dc.DetachFont());
   }
 
   dc.DetachDc();

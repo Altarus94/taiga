@@ -345,6 +345,8 @@ LRESULT SeasonDialog::OnListCustomDraw(LPARAM lParam) {
         hdc.SetTextColor(win::dark::SysColor(COLOR_GRAYTEXT));
         hdc.DrawText(text.c_str(), text.length(), rect,
                      DT_CENTER | DT_END_ELLIPSIS | DT_NOPREFIX | DT_SINGLELINE | DT_VCENTER);
+        // Restore the shared DC font
+        DeleteObject(hdc.DetachFont());
       }
       result = CDRF_NOTIFYITEMDRAW;
       break;
