@@ -1150,7 +1150,11 @@ void AnimeListDialog::ListView::DrawProgressText(HDC hdc, RECT* rc,
   // Draw text
   std::wstring text;
   win::Rect rcText = *rc;
-  COLORREF text_color = dc.GetTextColor();
+  // Don't inherit the DC text color: on a hot-tracked row the list leaves the
+  // theme's hot-state color behind, which is unreadable on a dark background
+  COLORREF text_color = win::dark::Enabled() ?
+      win::dark::SysColor(COLOR_WINDOWTEXT) : dc.GetTextColor();
+  dc.SetTextColor(text_color);
   dc.SetBkMode(TRANSPARENT);
 
   // Separator
